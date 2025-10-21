@@ -65,12 +65,11 @@ st.write("Upload a CSV or Excel (first sheet by default). Set the failing thresh
 
 uploaded = st.file_uploader("Upload CSV/XLSX", type=["csv", "xlsx", "xls"])
 threshold = st.number_input("Failing threshold", value=65.0, step=1.0)
-sheet_name = st.text_input("Excel sheet name (optional)", "")
 
 if uploaded:
-    # read
+    # Read file automatically
     if uploaded.name.lower().endswith((".xlsx", ".xls")):
-        df = pd.read_excel(uploaded, sheet_name=sheet_name if sheet_name else 0)
+        df = pd.read_excel(uploaded, sheet_name=0)  # Always reads the first sheet
     else:
         df = pd.read_csv(uploaded)
 
@@ -85,10 +84,10 @@ if uploaded:
         failing_rows.to_excel(writer, sheet_name="Failing_Rows", index=False)
         summary.to_excel(writer, sheet_name="Failing_Summary", index=False)
     xls_buf.seek(0)
-    st.download_button("⬇️ Download Excel (2 sheets)", data=xls_buf,
-                       file_name="failing_summary.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    st.download_button("⬇️ Download Summary Excel", data=xls_buf,
+                       file_name="failing_summary_excel.xlsx", mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 
     # 2) CSV (summary only)
     csv_buf = summary.to_csv(index=False).encode("utf-8")
     st.download_button("⬇️ Download Summary CSV", data=csv_buf,
-                       file_name="failing_summary_summary.csv", mime="text/csv")
+                       file_name="failing_summary_csv.csv", mime="text/csv")
